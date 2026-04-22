@@ -5,25 +5,185 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>FinSim</title>
     <style>
+      * {
+        box-sizing: border-box;
+      }
       body {
         margin: 0;
-        height: 100vh;
-        display: grid;
-        place-items: center;
-        color: #0b2a6f;
+        min-height: 100vh;
         font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
           Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        color: #0b2a6f;
       }
-      h1 {
-        font-size: 96px;
-        line-height: 1;
+      .site-header {
+        padding: 16px 20px;
+      }
+      .logo {
+        display: block;
+        height: 40px;
+        width: auto;
+      }
+      main {
+        padding: 20px;
+        max-width: 640px;
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .btn {
+        appearance: none;
+        border: 1px solid #0b2a6f;
+        background: #0b2a6f;
+        color: #fff;
+        font: inherit;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 10px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        filter: brightness(1.08);
+      }
+      .btn:focus-visible {
+        outline: 2px solid #2563eb;
+        outline-offset: 2px;
+      }
+      .create-panel {
+        display: none;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        background: #f8fafc;
+        box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+        min-width: 260px;
+      }
+      .create-panel.visible {
+        display: flex;
+      }
+      .create-panel label {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .create-panel input[type="text"] {
+        width: 100%;
+        font: inherit;
+        padding: 8px 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+      }
+      .create-panel .row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .btn-secondary {
+        background: #fff;
+        color: #0b2a6f;
+      }
+      h2 {
+        margin: 0 0 12px;
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .bank-list {
         margin: 0;
-        font-weight: 800;
-        letter-spacing: -0.04em;
+        padding-left: 1.25rem;
+      }
+      .bank-list li {
+        margin-bottom: 6px;
+      }
+      .empty {
+        margin: 0;
+        font-size: 14px;
+        color: #64748b;
       }
     </style>
   </head>
   <body>
-    <h1>FinSim</h1>
+    <header class="site-header">
+      <img
+        class="logo"
+        src="/images/FinSimLogo.png"
+        alt="FinSim"
+      />
+    </header>
+    <main>
+      <div class="toolbar">
+        <button type="button" class="btn" id="create-bank-btn">
+          Create Bank
+        </button>
+        <div class="create-panel" id="create-bank-panel" aria-hidden="true">
+          <label for="bank-name">Bank name</label>
+          <form method="post" action="/banks" id="create-bank-form">
+            <input
+              type="text"
+              id="bank-name"
+              name="name"
+              placeholder="e.g. First National"
+              required
+              maxlength="200"
+              autocomplete="organization"
+            />
+            <div class="row">
+              <button type="submit" class="btn">Save</button>
+              <button type="button" class="btn btn-secondary" id="cancel-create-bank">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <section aria-labelledby="banks-heading">
+        <h2 id="banks-heading">Banks</h2>
+        {% if banks | length == 0 %}
+        <p class="empty">No banks yet. Create one to get started.</p>
+        {% else %}
+        <ul class="bank-list">
+          {% for bank in banks %}
+          <li>{{ bank.name }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </section>
+    </main>
+    <script>
+      (function () {
+        var btn = document.getElementById("create-bank-btn");
+        var panel = document.getElementById("create-bank-panel");
+        var cancel = document.getElementById("cancel-create-bank");
+        var form = document.getElementById("create-bank-form");
+        var input = document.getElementById("bank-name");
+
+        function openPanel() {
+          panel.classList.add("visible");
+          panel.setAttribute("aria-hidden", "false");
+          input.focus();
+        }
+
+        function closePanel() {
+          panel.classList.remove("visible");
+          panel.setAttribute("aria-hidden", "true");
+          form.reset();
+        }
+
+        btn.addEventListener("click", function () {
+          if (panel.classList.contains("visible")) {
+            closePanel();
+          } else {
+            openPanel();
+          }
+        });
+
+        cancel.addEventListener("click", closePanel);
+      })();
+    </script>
   </body>
 </html>

@@ -7,6 +7,11 @@ primary_region = "sjc"
 
 [env]
   PORT = "8080"
+  FINSIM_DATA_DIR = "/data"
+
+[mounts]
+  source = "finsim_data"
+  destination = "/data"
 
 [http_service]
   internal_port = 8080

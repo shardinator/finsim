@@ -18,6 +18,7 @@ WORKDIR /app
 
 COPY --from=builder /app/target/release/finsim /app/finsim
 COPY --from=builder /app/templates /app/templates
+COPY images /app/images
 
 ENV PORT=8080
 EXPOSE 8080

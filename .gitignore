@@ -1,3 +1,4 @@
 target/
 .cargo-home/
+data/
 .DS_Store
