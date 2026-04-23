@@ -87,17 +87,29 @@
         background: #fff;
         color: #0b2a6f;
       }
-      h2 {
-        margin: 0 0 12px;
+      .banks-panel {
+        padding: 16px 18px;
+        border-radius: 10px;
+        background: #f8fafc;
+        box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+      }
+      .banks-panel h2 {
+        margin: 0 0 14px;
         font-size: 16px;
         font-weight: 700;
       }
-      .bank-list {
-        margin: 0;
-        padding-left: 1.25rem;
+      .bank-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
       }
-      .bank-list li {
-        margin-bottom: 6px;
+      .bank-item {
+        margin: 0;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: #fff;
+        font-size: 15px;
+        font-weight: 600;
       }
       .empty {
         margin: 0;
@@ -141,16 +153,16 @@
         </div>
       </div>
 
-      <section aria-labelledby="banks-heading">
+      <section class="banks-panel" aria-labelledby="banks-heading">
         <h2 id="banks-heading">Banks</h2>
         {% if banks | length == 0 %}
         <p class="empty">No banks yet. Create one to get started.</p>
         {% else %}
-        <ul class="bank-list">
+        <div class="bank-stack">
           {% for bank in banks %}
-          <li>{{ bank.name }}</li>
+          <div class="bank-item">{{ bank.name }}</div>
           {% endfor %}
-        </ul>
+        </div>
         {% endif %}
       </section>
     </main>
