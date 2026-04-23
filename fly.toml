@@ -1,27 +1,32 @@
-app = "finsim"
+# fly.toml app configuration file generated for finsim on 2026-04-23T00:03:10Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-primary_region = "sjc"
+app = 'finsim'
+primary_region = 'sin'
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = 'Dockerfile'
 
 [env]
-  PORT = "8080"
-  FINSIM_DATA_DIR = "/data"
+  FINSIM_DATA_DIR = '/data'
+  PORT = '8080'
 
-[mounts]
-  source = "finsim_data"
-  destination = "/data"
+[[mounts]]
+  source = 'finsim_data'
+  destination = '/data'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = "stop"
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
+  processes = ['app']
 
 [[vm]]
-  memory = "256mb"
-  cpu_kind = "shared"
+  memory = '256mb'
+  cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 256
