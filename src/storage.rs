@@ -20,7 +20,7 @@ use crate::models::Bank;
 
 const DEFAULT_DATA_DIR: &str = "data";
 /// Used on Render when `RENDER` is set and `FINSIM_DATA_DIR` is not.
-const RENDER_DEFAULT_DATA_DIR: &str = "/data";
+const RENDER_DEFAULT_DATA_DIR: &str = "/app/data";
 const BANKS_FILE: &str = "banks.dat";
 const FILE_HEADER: &str = "# finsim banks v1";
 
