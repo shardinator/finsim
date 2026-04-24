@@ -40,17 +40,24 @@ struct RemoveBankForm {
 }
 
 #[derive(Deserialize)]
-struct HomeQuery {
+struct UiQuery {
     #[serde(default, rename = "removeError")]
     remove_error: Option<String>,
 }
 
 #[handler]
-async fn settings(state: Data<&AppState>) -> poem::Result<Response> {
-    let html = state
-        .tera
-        .render("settings.html", &Context::new())
-        .map_err(|e| poem::Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
+async fn settings(
+    state: Data<&AppState>,
+    Query(query): Query<UiQuery>,
+) -> poem::Result<Response> {
+    let banks = state.banks.lock().await.clone();
+    let mut ctx = Context::new();
+    ctx.insert("banks", &banks);
+    ctx.insert("remove_error", &query.remove_error.is_some());
+
+    let html = state.tera.render("settings.html", &ctx).map_err(|e| {
+        poem::Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR)
+    })?;
 
     Ok(Response::builder()
         .header(CONTENT_TYPE, "text/html; charset=utf-8")
@@ -60,12 +67,11 @@ async fn settings(state: Data<&AppState>) -> poem::Result<Response> {
 #[handler]
 async fn home(
     state: Data<&AppState>,
-    Query(query): Query<HomeQuery>,
+    Query(_query): Query<UiQuery>,
 ) -> poem::Result<Response> {
     let banks = state.banks.lock().await.clone();
     let mut ctx = Context::new();
     ctx.insert("banks", &banks);
-    ctx.insert("remove_error", &query.remove_error.is_some());
 
     let html = state.tera.render("home.html", &ctx).map_err(|e| {
         poem::Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR)
@@ -83,7 +89,7 @@ async fn create_bank(
 ) -> poem::Result<Redirect> {
     let name = form.name.trim();
     if name.is_empty() {
-        return Ok(Redirect::see_other("/"));
+        return Ok(Redirect::see_other("/settings"));
     }
 
     let mut banks = state.banks.lock().await;
@@ -96,7 +102,7 @@ async fn create_bank(
     banks.push(Bank::new(next_id, name.to_string()));
 
     match storage::save_banks(&state.storage_path, &banks) {
-        Ok(()) => Ok(Redirect::see_other("/")),
+        Ok(()) => Ok(Redirect::see_other("/settings")),
         Err(e) => {
             banks.pop();
             Err(poem::Error::from_string(
@@ -115,7 +121,7 @@ async fn update_bank(
 ) -> poem::Result<Redirect> {
     let name = form.name.trim();
     if name.is_empty() {
-        return Ok(Redirect::see_other("/"));
+        return Ok(Redirect::see_other("/settings"));
     }
 
     let mut banks = state.banks.lock().await;
@@ -129,11 +135,11 @@ async fn update_bank(
         }
     }
     if !found {
-        return Ok(Redirect::see_other("/"));
+        return Ok(Redirect::see_other("/settings"));
     }
 
     match storage::save_banks(&state.storage_path, &banks) {
-        Ok(()) => Ok(Redirect::see_other("/")),
+        Ok(()) => Ok(Redirect::see_other("/settings")),
         Err(e) => {
             *banks = backup;
             Err(poem::Error::from_string(
@@ -158,17 +164,17 @@ async fn remove_bank(
     };
     let expected = format!("Please remove {}", bank_name);
     if typed != expected {
-        return Ok(Redirect::see_other("/?removeError=1"));
+        return Ok(Redirect::see_other("/settings?removeError=1"));
     }
 
     let backup = banks.clone();
     banks.retain(|b| b.id != id);
     if banks.len() == backup.len() {
-        return Ok(Redirect::see_other("/"));
+        return Ok(Redirect::see_other("/settings"));
     }
 
     match storage::save_banks(&state.storage_path, &banks) {
-        Ok(()) => Ok(Redirect::see_other("/")),
+        Ok(()) => Ok(Redirect::see_other("/settings")),
         Err(e) => {
             *banks = backup;
             Err(poem::Error::from_string(
