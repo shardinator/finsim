@@ -46,6 +46,18 @@ struct HomeQuery {
 }
 
 #[handler]
+async fn settings(state: Data<&AppState>) -> poem::Result<Response> {
+    let html = state
+        .tera
+        .render("settings.html", &Context::new())
+        .map_err(|e| poem::Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
+
+    Ok(Response::builder()
+        .header(CONTENT_TYPE, "text/html; charset=utf-8")
+        .body(html))
+}
+
+#[handler]
 async fn home(
     state: Data<&AppState>,
     Query(query): Query<HomeQuery>,
@@ -187,6 +199,7 @@ async fn main() -> std::io::Result<()> {
     let app = Route::new()
         .nest("/images", StaticFilesEndpoint::new("images"))
         .at("/", get(home))
+        .at("/settings", get(settings))
         .at("/banks/:id/remove", post(remove_bank))
         .at("/banks/:id/update", post(update_bank))
         .at("/banks", post(create_bank))

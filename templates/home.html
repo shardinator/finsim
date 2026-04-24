@@ -17,7 +17,47 @@
         background: #fff;
       }
       .siteHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
         padding: 0 0 16px;
+        max-width: 640px;
+      }
+      .navBrand {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+      }
+      .navBrand a {
+        line-height: 0;
+        text-decoration: none;
+      }
+      .navBrand a:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 4px;
+        border-radius: 4px;
+      }
+      .navActions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+      .navLink {
+        font-size: 14px;
+        font-weight: 600;
+        color: #0b2a6f;
+        text-decoration: none;
+        padding: 8px 10px;
+        border-radius: 8px;
+      }
+      .navLink:hover {
+        background: rgba(11, 42, 111, 0.06);
+      }
+      .navLink:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
       }
       .logo {
         display: block;
@@ -451,11 +491,18 @@
   </head>
   <body>
     <header class="siteHeader">
-      <img
-        class="logo"
-        src="/images/FinSimLogo.png"
-        alt="FinSim"
-      />
+      <div class="navBrand">
+        <a href="/">
+          <img
+            class="logo"
+            src="/images/FinSimLogo.png"
+            alt="FinSim — home"
+          />
+        </a>
+      </div>
+      <nav class="navActions" aria-label="Main">
+        <a href="/settings" class="navLink">Settings</a>
+      </nav>
     </header>
     <main>
       <div class="toolbar">

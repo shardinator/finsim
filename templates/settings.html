@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Settings — FinSim</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: clamp(48px, 10vh, 96px) clamp(24px, 6vw, 64px) 56px;
+        min-height: 100vh;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        color: #0b2a6f;
+        background: #fff;
+      }
+      .siteHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 0 16px;
+        max-width: 640px;
+      }
+      .navBrand {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+      }
+      .navBrand a {
+        line-height: 0;
+        text-decoration: none;
+      }
+      .navBrand a:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 4px;
+        border-radius: 4px;
+      }
+      .navActions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+      .navLink {
+        font-size: 14px;
+        font-weight: 600;
+        color: #0b2a6f;
+        text-decoration: none;
+        padding: 8px 10px;
+        border-radius: 8px;
+      }
+      .navLink:hover {
+        background: rgba(11, 42, 111, 0.06);
+      }
+      .navLink:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+      }
+      .navLink[aria-current="page"] {
+        background: #edf2f7;
+      }
+      .logo {
+        display: block;
+        height: 40px;
+        width: auto;
+      }
+      main {
+        margin-top: clamp(20px, 4vh, 40px);
+        padding: 0;
+        max-width: 640px;
+      }
+      main h1 {
+        margin: 0 0 12px;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      main p {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #64748b;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="siteHeader">
+      <div class="navBrand">
+        <a href="/">
+          <img
+            class="logo"
+            src="/images/FinSimLogo.png"
+            alt="FinSim — home"
+          />
+        </a>
+      </div>
+      <nav class="navActions" aria-label="Main">
+        <a href="/settings" class="navLink" aria-current="page">Settings</a>
+      </nav>
+    </header>
+    <main>
+      <h1>Settings</h1>
+      <p>Application settings will appear here.</p>
+    </main>
+  </body>
+</html>
