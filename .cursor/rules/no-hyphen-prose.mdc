@@ -1,0 +1,19 @@
+---
+description: Avoid typographic hyphens and dashes in user facing copy and docs
+alwaysApply: true
+---
+
+# No hyphens or em dashes in prose
+
+In this repository and in any user project you work on:
+
+- Do **not** use the **em dash** (—), **en dash** (–), or **ASCII hyphen** as punctuation in **user visible strings** (UI labels, titles, `alt` text, placeholders, error messages, README prose, comments meant for humans).
+- Prefer **commas**, **periods**, **colons**, **parentheses**, or **line breaks** instead of a dash between clauses.
+
+**Exemptions (do not change these):**
+
+- **HTML/CSS language syntax** that requires hyphens, for example `data-bank-id`, `aria-labelledby`, `width=device-width`, property names like `flex-direction`, and `calc()` subtraction.
+- **Rust** `crate-name` in `Cargo.toml`, paths, and code identifiers where the language or ecosystem requires hyphens.
+- **ISO dates**, **URLs**, and similar machine formats.
+
+When editing templates or copy, scan for `—`, `–`, and hyphen used as punctuation (for example `FinSim — home`) and rephrase.
