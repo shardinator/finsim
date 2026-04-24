@@ -2,10 +2,10 @@
 //!
 //! Data file: `banks.dat` inside the directory from [`data_directory`].
 //!
-//! **Render.com:** attach a persistent disk and set the environment variable
-//! `FINSIM_DATA_DIR` to the same absolute mount path you configure in the
-//! Render dashboard (for Docker services, a path under your image `WORKDIR`,
-//! for example `/app/data`). Only paths on that volume persist across deploys.
+//! **Render.com:** attach a persistent disk at `/data` (or set `FINSIM_DATA_DIR`
+//! to match your mount path). When `RENDER` is `true` and `FINSIM_DATA_DIR` is
+//! unset, the default is `/data`. Only paths on the mounted volume persist
+//! across deploys.
 //!
 //! **Local:** unset `FINSIM_DATA_DIR` to use the relative directory `data`.
 //!
@@ -19,6 +19,8 @@ use std::path::{Path, PathBuf};
 use crate::models::Bank;
 
 const DEFAULT_DATA_DIR: &str = "data";
+/// Used on Render when `RENDER` is set and `FINSIM_DATA_DIR` is not.
+const RENDER_DEFAULT_DATA_DIR: &str = "/data";
 const BANKS_FILE: &str = "banks.dat";
 const FILE_HEADER: &str = "# finsim banks v1";
 
@@ -27,7 +29,13 @@ const FILE_HEADER: &str = "# finsim banks v1";
 pub fn data_directory() -> PathBuf {
     match std::env::var("FINSIM_DATA_DIR") {
         Ok(s) if !s.trim().is_empty() => PathBuf::from(s.trim()),
-        _ => PathBuf::from(DEFAULT_DATA_DIR),
+        _ => {
+            if std::env::var("RENDER").ok().as_deref() == Some("true") {
+                PathBuf::from(RENDER_DEFAULT_DATA_DIR)
+            } else {
+                PathBuf::from(DEFAULT_DATA_DIR)
+            }
+        }
     }
 }
 
