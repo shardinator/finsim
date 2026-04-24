@@ -10,7 +10,7 @@ use poem::{
     get, handler, post,
     http::{header::CONTENT_TYPE, StatusCode},
     listener::TcpListener,
-    web::{Data, Form, Redirect},
+    web::{Data, Form, Path, Redirect},
     EndpointExt, Response, Route, Server,
 };
 use serde::Deserialize;
@@ -27,6 +27,11 @@ struct AppState {
 #[derive(Deserialize)]
 struct CreateBankForm {
     name: String,
+}
+
+#[derive(Deserialize)]
+struct BankIdPath {
+    id: u64,
 }
 
 #[handler]
@@ -75,6 +80,30 @@ async fn create_bank(
     }
 }
 
+#[handler]
+async fn remove_bank(
+    state: Data<&AppState>,
+    Path(BankIdPath { id }): Path<BankIdPath>,
+) -> poem::Result<Redirect> {
+    let mut banks = state.banks.lock().await;
+    let backup = banks.clone();
+    banks.retain(|b| b.id != id);
+    if banks.len() == backup.len() {
+        return Ok(Redirect::see_other("/"));
+    }
+
+    match storage::save_banks(&state.storage_path, &banks) {
+        Ok(()) => Ok(Redirect::see_other("/")),
+        Err(e) => {
+            *banks = backup;
+            Err(poem::Error::from_string(
+                format!("failed to save banks: {e}"),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            ))
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let tera = Tera::new("templates/**/*").expect("failed to load templates");
@@ -95,6 +124,7 @@ async fn main() -> std::io::Result<()> {
     let app = Route::new()
         .nest("/images", StaticFilesEndpoint::new("images"))
         .at("/", get(home))
+        .at("/banks/:id/remove", post(remove_bank))
         .at("/banks", post(create_bank))
         .data(state);
 

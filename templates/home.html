@@ -15,7 +15,7 @@
           Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
         color: #0b2a6f;
       }
-      .site-header {
+      .siteHeader {
         padding: 0 0 16px;
       }
       .logo {
@@ -54,73 +54,166 @@
         outline: 2px solid #2563eb;
         outline-offset: 2px;
       }
-      .create-panel {
+      .createPanel {
         display: none;
         flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-        padding: 14px 16px;
-        border-radius: 8px;
+        align-items: stretch;
+        gap: 14px;
+        padding: 20px 22px 22px;
+        border-radius: 12px;
         background: #f8fafc;
         box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
-        min-width: 260px;
+        min-width: min(100%, 288px);
+        max-width: 420px;
+        flex: 1 1 288px;
       }
-      .create-panel.visible {
+      .createPanel.visible {
         display: flex;
       }
-      .create-panel label {
-        font-size: 13px;
-        font-weight: 600;
+      .createPanel label {
+        display: block;
+        margin: 0;
+        padding: 0 2px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.35;
+        color: #0b2a6f;
       }
-      .create-panel input[type="text"] {
+      .createPanel form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
         width: 100%;
+        margin: 0;
+      }
+      .createPanel input[type="text"] {
+        width: 100%;
+        margin: 0;
         font: inherit;
-        padding: 8px 10px;
+        font-size: 15px;
+        line-height: 1.4;
+        padding: 12px 14px;
+        min-height: 48px;
         border: 1px solid #cbd5e1;
-        border-radius: 6px;
+        border-radius: 10px;
+        color: #0b2a6f;
+        background: #fff;
       }
-      .create-panel .row {
+      .createPanel input[type="text"]::placeholder {
+        color: #94a3b8;
+      }
+      .createPanel input[type="text"]:hover {
+        border-color: #94a3b8;
+      }
+      .createPanel input[type="text"]:focus {
+        outline: none;
+        border-color: #0b2a6f;
+        box-shadow: 0 0 0 3px rgba(11, 42, 111, 0.12);
+      }
+      .createPanel input[type="text"]:focus-visible {
+        outline: none;
+        border-color: #0b2a6f;
+        box-shadow: 0 0 0 3px rgba(11, 42, 111, 0.12);
+      }
+      .createPanel .row {
         display: flex;
-        gap: 8px;
+        gap: 10px;
         flex-wrap: wrap;
+        align-items: center;
+        padding-top: 2px;
       }
-      .btn-secondary {
+      .createPanel .row .btn {
+        min-height: 44px;
+        padding-inline: 18px;
+      }
+      .btnSecondary {
         background: #fff;
         color: #0b2a6f;
       }
-      .banks-panel {
-        padding: 16px 18px;
-        border-radius: 10px;
+      .banksPanel {
+        padding: 22px 24px 24px;
+        border-radius: 12px;
         background: #f8fafc;
         box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
       }
-      .banks-panel h2 {
-        margin: 0 0 14px;
-        font-size: 16px;
+      .banksPanel h2 {
+        margin: 0 0 18px;
+        padding: 0 2px;
+        font-size: 17px;
         font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.3;
       }
-      .bank-stack {
+      .bankStack {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 12px;
       }
-      .bank-item {
+      .bankItem {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
         margin: 0;
-        padding: 10px 12px;
-        border-radius: 8px;
+        padding: 14px 18px;
+        min-height: 52px;
+        border-radius: 10px;
         background: #fff;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+      }
+      .bankItemName {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 2px 12px 2px 2px;
         font-size: 15px;
         font-weight: 600;
+        line-height: 1.45;
+        letter-spacing: -0.01em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
+      .bankItem form {
+        margin: 0;
+        flex-shrink: 0;
+        align-self: center;
+      }
+      .btnRemove {
+        appearance: none;
+        border: 1px solid #fdba74;
+        background: #ffedd5;
+        color: #c2410c;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.2;
+        padding: 8px 14px;
+        min-height: 36px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .btnRemove:hover {
+        color: #9a3412;
+        background: #fed7aa;
+        border-color: #fb923c;
+      }
+      .btnRemove:focus-visible {
+        outline: 2px solid #ea580c;
+        outline-offset: 2px;
+      }
+
       .empty {
         margin: 0;
+        padding: 4px 2px 2px;
         font-size: 14px;
+        line-height: 1.5;
         color: #64748b;
       }
     </style>
   </head>
   <body>
-    <header class="site-header">
+    <header class="siteHeader">
       <img
         class="logo"
         src="/images/FinSimLogo.png"
@@ -129,15 +222,15 @@
     </header>
     <main>
       <div class="toolbar">
-        <button type="button" class="btn" id="create-bank-btn">
+        <button type="button" class="btn" id="createBankBtn">
           Create Bank
         </button>
-        <div class="create-panel" id="create-bank-panel" aria-hidden="true">
-          <label for="bank-name">Bank name</label>
-          <form method="post" action="/banks" id="create-bank-form">
+        <div class="createPanel" id="createBankPanel" aria-hidden="true">
+          <label for="bankName">Bank name</label>
+          <form method="post" action="/banks" id="createBankForm">
             <input
               type="text"
-              id="bank-name"
+              id="bankName"
               name="name"
               placeholder="e.g. First National"
               required
@@ -146,7 +239,7 @@
             />
             <div class="row">
               <button type="submit" class="btn">Save</button>
-              <button type="button" class="btn btn-secondary" id="cancel-create-bank">
+              <button type="button" class="btn btnSecondary" id="cancelCreateBank">
                 Cancel
               </button>
             </div>
@@ -154,14 +247,19 @@
         </div>
       </div>
 
-      <section class="banks-panel" aria-labelledby="banks-heading">
-        <h2 id="banks-heading">Banks</h2>
+      <section class="banksPanel" aria-labelledby="banksHeading">
+        <h2 id="banksHeading">Banks</h2>
         {% if banks | length == 0 %}
         <p class="empty">No banks yet. Create one to get started.</p>
         {% else %}
-        <div class="bank-stack">
+        <div class="bankStack">
           {% for bank in banks %}
-          <div class="bank-item">{{ bank.name }}</div>
+          <div class="bankItem">
+            <span class="bankItemName">{{ bank.name }}</span>
+            <form method="post" action="/banks/{{ bank.id }}/remove">
+              <button type="submit" class="btnRemove">Remove</button>
+            </form>
+          </div>
           {% endfor %}
         </div>
         {% endif %}
@@ -169,11 +267,11 @@
     </main>
     <script>
       (function () {
-        var btn = document.getElementById("create-bank-btn");
-        var panel = document.getElementById("create-bank-panel");
-        var cancel = document.getElementById("cancel-create-bank");
-        var form = document.getElementById("create-bank-form");
-        var input = document.getElementById("bank-name");
+        var btn = document.getElementById("createBankBtn");
+        var panel = document.getElementById("createBankPanel");
+        var cancel = document.getElementById("cancelCreateBank");
+        var form = document.getElementById("createBankForm");
+        var input = document.getElementById("bankName");
 
         function openPanel() {
           panel.classList.add("visible");
