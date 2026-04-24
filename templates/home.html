@@ -14,6 +14,7 @@
         font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
           Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
         color: #0b2a6f;
+        background: #fff;
       }
       .siteHeader {
         padding: 0 0 16px;
@@ -37,7 +38,7 @@
       }
       .btn {
         appearance: none;
-        border: 1px solid #0b2a6f;
+        border: none;
         background: #0b2a6f;
         color: #fff;
         font: inherit;
@@ -48,10 +49,10 @@
         cursor: pointer;
       }
       .btn:hover {
-        filter: brightness(1.08);
+        background: #0d3578;
       }
       .btn:focus-visible {
-        outline: 2px solid #2563eb;
+        outline: 2px solid #3b82f6;
         outline-offset: 2px;
       }
       .createPanel {
@@ -61,8 +62,7 @@
         gap: 14px;
         padding: 20px 22px 22px;
         border-radius: 12px;
-        background: #f8fafc;
-        box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+        background: #edf2f7;
         min-width: min(100%, 288px);
         max-width: 420px;
         flex: 1 1 288px;
@@ -95,7 +95,7 @@
         line-height: 1.4;
         padding: 12px 14px;
         min-height: 48px;
-        border: 1px solid #cbd5e1;
+        border: none;
         border-radius: 10px;
         color: #0b2a6f;
         background: #fff;
@@ -104,17 +104,16 @@
         color: #94a3b8;
       }
       .createPanel input[type="text"]:hover {
-        border-color: #94a3b8;
+        background: #f8fafc;
       }
       .createPanel input[type="text"]:focus {
         outline: none;
-        border-color: #0b2a6f;
-        box-shadow: 0 0 0 3px rgba(11, 42, 111, 0.12);
+        background: #eff6ff;
       }
       .createPanel input[type="text"]:focus-visible {
-        outline: none;
-        border-color: #0b2a6f;
-        box-shadow: 0 0 0 3px rgba(11, 42, 111, 0.12);
+        outline: 2px solid #3b82f6;
+        outline-offset: 0;
+        background: #eff6ff;
       }
       .createPanel .row {
         display: flex;
@@ -128,14 +127,20 @@
         padding-inline: 18px;
       }
       .btnSecondary {
-        background: #fff;
+        background: #e2e8f0;
         color: #0b2a6f;
+      }
+      .btn.btnSecondary:hover {
+        background: #cbd5e1;
+      }
+      .btn.btnSecondary:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
       }
       .banksPanel {
         padding: 22px 24px 24px;
         border-radius: 12px;
-        background: #f8fafc;
-        box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+        background: #edf2f7;
       }
       .banksPanel h2 {
         margin: 0 0 18px;
@@ -160,19 +165,36 @@
         min-height: 52px;
         border-radius: 10px;
         background: #fff;
-        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
       }
       .bankItemName {
-        flex: 1 1 auto;
+        flex: 0 1 auto;
+        width: max-content;
+        max-width: calc(100% - 120px);
         min-width: 0;
-        padding: 2px 12px 2px 2px;
+        margin: 0;
+        padding: 3px 6px;
+        font: inherit;
         font-size: 15px;
         font-weight: 600;
         line-height: 1.45;
         letter-spacing: -0.01em;
+        color: inherit;
+        text-align: left;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        appearance: none;
+        border: none;
+        border-radius: 6px;
+        background: transparent;
+        cursor: pointer;
+      }
+      .bankItemName:hover {
+        background: rgba(11, 42, 111, 0.028);
+      }
+      .bankItemName:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
       }
       .bankItem form {
         margin: 0;
@@ -181,7 +203,7 @@
       }
       .btnRemove {
         appearance: none;
-        border: 1px solid #fdba74;
+        border: none;
         background: #ffedd5;
         color: #c2410c;
         font: inherit;
@@ -195,8 +217,7 @@
       }
       .btnRemove:hover {
         color: #9a3412;
-        background: #fed7aa;
-        border-color: #fb923c;
+        background: #fdba74;
       }
       .btnRemove:focus-visible {
         outline: 2px solid #ea580c;
@@ -209,6 +230,107 @@
         font-size: 14px;
         line-height: 1.5;
         color: #64748b;
+      }
+
+      .editBankOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+      }
+      .editBankOverlay.open {
+        display: flex;
+      }
+      .editBankBackdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.45);
+      }
+      .editBankDialog {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 420px;
+        padding: 22px 24px 24px;
+        border-radius: 12px;
+        background: #f8fafc;
+      }
+      .editBankDialog h3 {
+        margin: 0 0 6px;
+        padding: 0 2px;
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.3;
+        color: #0b2a6f;
+      }
+      .editBankDialog .editBankHint {
+        margin: 0 0 18px;
+        padding: 0 2px;
+        font-size: 13px;
+        line-height: 1.45;
+        color: #64748b;
+      }
+      .editBankDialog form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        margin: 0;
+      }
+      .editBankDialog label {
+        display: block;
+        margin: 0;
+        padding: 0 2px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #0b2a6f;
+      }
+      .editBankDialog input[type="text"] {
+        width: 100%;
+        margin: 0;
+        font: inherit;
+        font-size: 15px;
+        line-height: 1.4;
+        padding: 12px 14px;
+        min-height: 48px;
+        border: none;
+        border-radius: 10px;
+        color: #0b2a6f;
+        background: #fff;
+      }
+      .editBankDialog input[type="text"]::placeholder {
+        color: #94a3b8;
+      }
+      .editBankDialog input[type="text"]:hover {
+        background: #f1f5f9;
+      }
+      .editBankDialog input[type="text"]:focus {
+        outline: none;
+        background: #eff6ff;
+      }
+      .editBankDialog input[type="text"]:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 0;
+        background: #eff6ff;
+      }
+      .editBankDialog .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        padding-top: 2px;
+      }
+      .editBankDialog .row .btn {
+        min-height: 44px;
+        padding-inline: 18px;
+      }
+      body.editBankOpen {
+        overflow: hidden;
       }
     </style>
   </head>
@@ -255,7 +377,15 @@
         <div class="bankStack">
           {% for bank in banks %}
           <div class="bankItem">
-            <span class="bankItemName">{{ bank.name }}</span>
+            <button
+              type="button"
+              class="bankItemName"
+              data-bank-id="{{ bank.id }}"
+              data-bank-name="{{ bank.name }}"
+              title="Edit bank name"
+            >
+              {{ bank.name }}
+            </button>
             <form method="post" action="/banks/{{ bank.id }}/remove">
               <button type="submit" class="btnRemove">Remove</button>
             </form>
@@ -265,6 +395,44 @@
         {% endif %}
       </section>
     </main>
+
+    <div
+      id="editBankOverlay"
+      class="editBankOverlay"
+      aria-hidden="true"
+    >
+      <div class="editBankBackdrop" id="editBankBackdrop" aria-hidden="true"></div>
+      <div
+        class="editBankDialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="editBankTitle"
+        aria-describedby="editBankHint"
+      >
+        <h3 id="editBankTitle">Edit bank name</h3>
+        <p id="editBankHint" class="editBankHint">
+          Change the name shown for this bank. Save applies to storage.
+        </p>
+        <form method="post" action="#" id="editBankForm">
+          <label for="editBankNameInput">Bank name</label>
+          <input
+            type="text"
+            id="editBankNameInput"
+            name="name"
+            required
+            maxlength="200"
+            autocomplete="organization"
+          />
+          <div class="row">
+            <button type="submit" class="btn">Save</button>
+            <button type="button" class="btn btnSecondary" id="editBankCancelBtn">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script>
       (function () {
         var btn = document.getElementById("createBankBtn");
@@ -294,6 +462,66 @@
         });
 
         cancel.addEventListener("click", closePanel);
+      })();
+
+      (function () {
+        var overlay = document.getElementById("editBankOverlay");
+        var backdrop = document.getElementById("editBankBackdrop");
+        var form = document.getElementById("editBankForm");
+        var input = document.getElementById("editBankNameInput");
+        var cancelBtn = document.getElementById("editBankCancelBtn");
+
+        function closeCreateIfOpen() {
+          var createPanel = document.getElementById("createBankPanel");
+          if (createPanel && createPanel.classList.contains("visible")) {
+            createPanel.classList.remove("visible");
+            createPanel.setAttribute("aria-hidden", "true");
+            var cf = document.getElementById("createBankForm");
+            if (cf) {
+              cf.reset();
+            }
+          }
+        }
+
+        function openEdit(bankId, bankName) {
+          closeCreateIfOpen();
+          form.action = "/banks/" + bankId + "/update";
+          input.value = bankName;
+          overlay.classList.add("open");
+          overlay.setAttribute("aria-hidden", "false");
+          document.body.classList.add("editBankOpen");
+          setTimeout(function () {
+            input.focus();
+            input.select();
+          }, 0);
+        }
+
+        function closeEdit() {
+          overlay.classList.remove("open");
+          overlay.setAttribute("aria-hidden", "true");
+          document.body.classList.remove("editBankOpen");
+          form.action = "#";
+          input.value = "";
+        }
+
+        document.querySelectorAll(".bankItemName").forEach(function (el) {
+          el.addEventListener("click", function () {
+            var id = el.getAttribute("data-bank-id");
+            var name = el.getAttribute("data-bank-name") || "";
+            if (id) {
+              openEdit(id, name);
+            }
+          });
+        });
+
+        backdrop.addEventListener("click", closeEdit);
+        cancelBtn.addEventListener("click", closeEdit);
+
+        document.addEventListener("keydown", function (ev) {
+          if (ev.key === "Escape" && overlay.classList.contains("open")) {
+            closeEdit();
+          }
+        });
       })();
     </script>
   </body>

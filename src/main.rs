@@ -81,6 +81,43 @@ async fn create_bank(
 }
 
 #[handler]
+async fn update_bank(
+    state: Data<&AppState>,
+    Path(BankIdPath { id }): Path<BankIdPath>,
+    Form(form): Form<CreateBankForm>,
+) -> poem::Result<Redirect> {
+    let name = form.name.trim();
+    if name.is_empty() {
+        return Ok(Redirect::see_other("/"));
+    }
+
+    let mut banks = state.banks.lock().await;
+    let backup = banks.clone();
+    let mut found = false;
+    for b in banks.iter_mut() {
+        if b.id == id {
+            b.name = name.to_string();
+            found = true;
+            break;
+        }
+    }
+    if !found {
+        return Ok(Redirect::see_other("/"));
+    }
+
+    match storage::save_banks(&state.storage_path, &banks) {
+        Ok(()) => Ok(Redirect::see_other("/")),
+        Err(e) => {
+            *banks = backup;
+            Err(poem::Error::from_string(
+                format!("failed to save banks: {e}"),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            ))
+        }
+    }
+}
+
+#[handler]
 async fn remove_bank(
     state: Data<&AppState>,
     Path(BankIdPath { id }): Path<BankIdPath>,
@@ -125,6 +162,7 @@ async fn main() -> std::io::Result<()> {
         .nest("/images", StaticFilesEndpoint::new("images"))
         .at("/", get(home))
         .at("/banks/:id/remove", post(remove_bank))
+        .at("/banks/:id/update", post(update_bank))
         .at("/banks", post(create_bank))
         .data(state);
 
