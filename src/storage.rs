@@ -1,6 +1,16 @@
 //! Bank persistence using only the standard library.
-//! Format: UTF-8 text file `banks.dat` under `FINSIM_DATA_DIR` (default `data`).
-//! Lines are either `# ...` (comments / header) or `id\tescaped_name`.
+//!
+//! Data file: `banks.dat` inside the directory from [`data_directory`].
+//!
+//! **Render.com:** attach a persistent disk and set the environment variable
+//! `FINSIM_DATA_DIR` to the same absolute mount path you configure in the
+//! Render dashboard (for Docker services, a path under your image `WORKDIR`,
+//! for example `/app/data`). Only paths on that volume persist across deploys.
+//!
+//! **Local:** unset `FINSIM_DATA_DIR` to use the relative directory `data`.
+//!
+//! File format: UTF-8 lines, either `# ...` (comments or header) or
+//! `id\tescaped_name`.
 
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, BufWriter, Write};
@@ -12,9 +22,17 @@ const DEFAULT_DATA_DIR: &str = "data";
 const BANKS_FILE: &str = "banks.dat";
 const FILE_HEADER: &str = "# finsim banks v1";
 
+/// Directory that will contain `banks.dat`.
+/// Prefer setting `FINSIM_DATA_DIR` on Render to your disk mount path.
+pub fn data_directory() -> PathBuf {
+    match std::env::var("FINSIM_DATA_DIR") {
+        Ok(s) if !s.trim().is_empty() => PathBuf::from(s.trim()),
+        _ => PathBuf::from(DEFAULT_DATA_DIR),
+    }
+}
+
 pub fn banks_file_path() -> PathBuf {
-    let dir = std::env::var("FINSIM_DATA_DIR").unwrap_or_else(|_| DEFAULT_DATA_DIR.to_string());
-    PathBuf::from(dir).join(BANKS_FILE)
+    data_directory().join(BANKS_FILE)
 }
 
 fn escape_name(s: &str) -> String {

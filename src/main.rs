@@ -190,6 +190,17 @@ async fn main() -> std::io::Result<()> {
     let storage_path = storage::banks_file_path();
     let initial_banks = storage::load_banks(&storage_path);
 
+    eprintln!("FinSim: bank data path {}", storage_path.display());
+    if std::env::var("RENDER").ok().as_deref() == Some("true")
+        && std::env::var("FINSIM_DATA_DIR").map(|v| v.trim().is_empty()).unwrap_or(true)
+    {
+        eprintln!(
+            "FinSim: warning: RENDER is true but FINSIM_DATA_DIR is not set. \
+             Bank files use relative `data/` and may be lost on deploy. \
+             Set FINSIM_DATA_DIR to your persistent disk mount path."
+        );
+    }
+
     let state = AppState {
         tera,
         banks: Arc::new(Mutex::new(initial_banks)),

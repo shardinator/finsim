@@ -1,0 +1,21 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+#
+# Persistent disk: mount path and FINSIM_DATA_DIR must match so banks.dat
+# survives deploys. For Docker, use a directory under WORKDIR (/app in Dockerfile).
+#
+# Adjust disk.sizeGB or plan as needed. Disks require a paid instance type.
+
+services:
+  - type: web
+    name: finsim
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    plan: starter
+    disk:
+      name: finsim-data
+      mountPath: /app/data
+      sizeGB: 1
+    envVars:
+      - key: FINSIM_DATA_DIR
+        value: /app/data
