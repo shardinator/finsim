@@ -10,7 +10,7 @@ use poem::{
     get, handler, post,
     http::{header::CONTENT_TYPE, StatusCode},
     listener::TcpListener,
-    web::{Data, Form, Path, Redirect},
+    web::{Data, Form, Path, Query, Redirect},
     EndpointExt, Response, Route, Server,
 };
 use serde::Deserialize;
@@ -34,11 +34,26 @@ struct BankIdPath {
     id: u64,
 }
 
+#[derive(Deserialize)]
+struct RemoveBankForm {
+    confirmation: String,
+}
+
+#[derive(Deserialize)]
+struct HomeQuery {
+    #[serde(default, rename = "removeError")]
+    remove_error: Option<String>,
+}
+
 #[handler]
-async fn home(state: Data<&AppState>) -> poem::Result<Response> {
+async fn home(
+    state: Data<&AppState>,
+    Query(query): Query<HomeQuery>,
+) -> poem::Result<Response> {
     let banks = state.banks.lock().await.clone();
     let mut ctx = Context::new();
     ctx.insert("banks", &banks);
+    ctx.insert("remove_error", &query.remove_error.is_some());
 
     let html = state.tera.render("home.html", &ctx).map_err(|e| {
         poem::Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR)
@@ -121,8 +136,19 @@ async fn update_bank(
 async fn remove_bank(
     state: Data<&AppState>,
     Path(BankIdPath { id }): Path<BankIdPath>,
+    Form(form): Form<RemoveBankForm>,
 ) -> poem::Result<Redirect> {
+    let typed = form.confirmation.trim();
     let mut banks = state.banks.lock().await;
+    let bank_name = match banks.iter().find(|b| b.id == id) {
+        Some(b) => b.name.clone(),
+        None => return Ok(Redirect::see_other("/")),
+    };
+    let expected = format!("Please remove {}", bank_name);
+    if typed != expected {
+        return Ok(Redirect::see_other("/?removeError=1"));
+    }
+
     let backup = banks.clone();
     banks.retain(|b| b.id != id);
     if banks.len() == backup.len() {

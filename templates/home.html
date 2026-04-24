@@ -196,8 +196,7 @@
         outline: 2px solid #3b82f6;
         outline-offset: 2px;
       }
-      .bankItem form {
-        margin: 0;
+      .bankItem .btnRemove {
         flex-shrink: 0;
         align-self: center;
       }
@@ -329,8 +328,124 @@
         min-height: 44px;
         padding-inline: 18px;
       }
-      body.editBankOpen {
+      body.editBankOpen,
+      body.removeBankOpen {
         overflow: hidden;
+      }
+
+      .removeBankOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 210;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+      }
+      .removeBankOverlay.open {
+        display: flex;
+      }
+      .removeBankBackdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.45);
+      }
+      .removeBankDialog {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 420px;
+        padding: 22px 24px 24px;
+        border-radius: 12px;
+        background: #f8fafc;
+      }
+      .removeBankDialog h3 {
+        margin: 0 0 6px;
+        padding: 0 2px;
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.3;
+        color: #0b2a6f;
+      }
+      .removeBankDialog .removeBankInstruction {
+        margin: 0 0 10px;
+        padding: 0 2px;
+        font-size: 13px;
+        line-height: 1.45;
+        color: #64748b;
+      }
+      .removeBankPhrase {
+        margin: 0 0 18px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.45;
+        color: #0b2a6f;
+        background: #e2e8f0;
+        word-break: break-word;
+      }
+      .removeBankDialog form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        margin: 0;
+      }
+      .removeBankDialog label {
+        display: block;
+        margin: 0;
+        padding: 0 2px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #0b2a6f;
+      }
+      .removeBankDialog input[type="text"] {
+        width: 100%;
+        margin: 0;
+        font: inherit;
+        font-size: 15px;
+        line-height: 1.4;
+        padding: 12px 14px;
+        min-height: 48px;
+        border: none;
+        border-radius: 10px;
+        color: #0b2a6f;
+        background: #fff;
+      }
+      .removeBankDialog input[type="text"]:hover {
+        background: #f1f5f9;
+      }
+      .removeBankDialog input[type="text"]:focus {
+        outline: none;
+        background: #eff6ff;
+      }
+      .removeBankDialog input[type="text"]:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 0;
+        background: #eff6ff;
+      }
+      .removeBankDialog .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        padding-top: 2px;
+      }
+      .removeBankDialog .row .btn {
+        min-height: 44px;
+        padding-inline: 18px;
+      }
+      .formFlash {
+        margin: 0 0 16px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-size: 14px;
+        line-height: 1.45;
+        color: #7f1d1d;
+        background: #fee2e2;
       }
     </style>
   </head>
@@ -371,6 +486,11 @@
 
       <section class="banksPanel" aria-labelledby="banksHeading">
         <h2 id="banksHeading">Banks</h2>
+        {% if remove_error %}
+        <p class="formFlash" role="status">
+          The confirmation text did not match. This bank was not removed.
+        </p>
+        {% endif %}
         {% if banks | length == 0 %}
         <p class="empty">No banks yet. Create one to get started.</p>
         {% else %}
@@ -386,9 +506,14 @@
             >
               {{ bank.name }}
             </button>
-            <form method="post" action="/banks/{{ bank.id }}/remove">
-              <button type="submit" class="btnRemove">Remove</button>
-            </form>
+            <button
+              type="button"
+              class="btnRemove"
+              data-bank-id="{{ bank.id }}"
+              data-bank-name="{{ bank.name }}"
+            >
+              Remove
+            </button>
           </div>
           {% endfor %}
         </div>
@@ -433,6 +558,47 @@
       </div>
     </div>
 
+    <div
+      id="removeBankOverlay"
+      class="removeBankOverlay"
+      aria-hidden="true"
+    >
+      <div class="removeBankBackdrop" id="removeBankBackdrop" aria-hidden="true"></div>
+      <div
+        class="removeBankDialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="removeBankTitle"
+        aria-describedby="removeBankInstruction removeBankPhraseText"
+      >
+        <h3 id="removeBankTitle">Remove bank</h3>
+        <p id="removeBankInstruction" class="removeBankInstruction">
+          To confirm removal, type the following sentence exactly in the box
+          below (including capitalization and spaces), then choose
+          <strong>Remove bank</strong>.
+        </p>
+        <p class="removeBankPhrase" id="removeBankPhraseText"></p>
+        <form method="post" action="#" id="removeBankForm">
+          <label for="removeBankConfirmInput">Confirmation</label>
+          <input
+            type="text"
+            id="removeBankConfirmInput"
+            name="confirmation"
+            required
+            maxlength="280"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <div class="row">
+            <button type="submit" class="btn">Remove bank</button>
+            <button type="button" class="btn btnSecondary" id="removeBankCancelBtn">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script>
       (function () {
         var btn = document.getElementById("createBankBtn");
@@ -465,11 +631,18 @@
       })();
 
       (function () {
-        var overlay = document.getElementById("editBankOverlay");
-        var backdrop = document.getElementById("editBankBackdrop");
-        var form = document.getElementById("editBankForm");
-        var input = document.getElementById("editBankNameInput");
-        var cancelBtn = document.getElementById("editBankCancelBtn");
+        var editOverlay = document.getElementById("editBankOverlay");
+        var editBackdrop = document.getElementById("editBankBackdrop");
+        var editForm = document.getElementById("editBankForm");
+        var editInput = document.getElementById("editBankNameInput");
+        var editCancelBtn = document.getElementById("editBankCancelBtn");
+
+        var removeOverlay = document.getElementById("removeBankOverlay");
+        var removeBackdrop = document.getElementById("removeBankBackdrop");
+        var removeForm = document.getElementById("removeBankForm");
+        var removeInput = document.getElementById("removeBankConfirmInput");
+        var removePhraseEl = document.getElementById("removeBankPhraseText");
+        var removeCancelBtn = document.getElementById("removeBankCancelBtn");
 
         function closeCreateIfOpen() {
           var createPanel = document.getElementById("createBankPanel");
@@ -483,25 +656,54 @@
           }
         }
 
-        function openEdit(bankId, bankName) {
-          closeCreateIfOpen();
-          form.action = "/banks/" + bankId + "/update";
-          input.value = bankName;
-          overlay.classList.add("open");
-          overlay.setAttribute("aria-hidden", "false");
-          document.body.classList.add("editBankOpen");
-          setTimeout(function () {
-            input.focus();
-            input.select();
-          }, 0);
+        function closeRemove() {
+          removeOverlay.classList.remove("open");
+          removeOverlay.setAttribute("aria-hidden", "true");
+          document.body.classList.remove("removeBankOpen");
+          removeForm.action = "#";
+          removeInput.value = "";
+          if (removePhraseEl) {
+            removePhraseEl.textContent = "";
+          }
         }
 
         function closeEdit() {
-          overlay.classList.remove("open");
-          overlay.setAttribute("aria-hidden", "true");
+          editOverlay.classList.remove("open");
+          editOverlay.setAttribute("aria-hidden", "true");
           document.body.classList.remove("editBankOpen");
-          form.action = "#";
-          input.value = "";
+          editForm.action = "#";
+          editInput.value = "";
+        }
+
+        function openEdit(bankId, bankName) {
+          closeRemove();
+          closeCreateIfOpen();
+          editForm.action = "/banks/" + bankId + "/update";
+          editInput.value = bankName;
+          editOverlay.classList.add("open");
+          editOverlay.setAttribute("aria-hidden", "false");
+          document.body.classList.add("editBankOpen");
+          setTimeout(function () {
+            editInput.focus();
+            editInput.select();
+          }, 0);
+        }
+
+        function openRemove(bankId, bankName) {
+          closeEdit();
+          closeCreateIfOpen();
+          var phrase = "Please remove " + bankName;
+          removeForm.action = "/banks/" + bankId + "/remove";
+          if (removePhraseEl) {
+            removePhraseEl.textContent = phrase;
+          }
+          removeInput.value = "";
+          removeOverlay.classList.add("open");
+          removeOverlay.setAttribute("aria-hidden", "false");
+          document.body.classList.add("removeBankOpen");
+          setTimeout(function () {
+            removeInput.focus();
+          }, 0);
         }
 
         document.querySelectorAll(".bankItemName").forEach(function (el) {
@@ -514,11 +716,29 @@
           });
         });
 
-        backdrop.addEventListener("click", closeEdit);
-        cancelBtn.addEventListener("click", closeEdit);
+        document.querySelectorAll(".bankItem .btnRemove").forEach(function (el) {
+          el.addEventListener("click", function () {
+            var id = el.getAttribute("data-bank-id");
+            var name = el.getAttribute("data-bank-name") || "";
+            if (id) {
+              openRemove(id, name);
+            }
+          });
+        });
+
+        editBackdrop.addEventListener("click", closeEdit);
+        editCancelBtn.addEventListener("click", closeEdit);
+
+        removeBackdrop.addEventListener("click", closeRemove);
+        removeCancelBtn.addEventListener("click", closeRemove);
 
         document.addEventListener("keydown", function (ev) {
-          if (ev.key === "Escape" && overlay.classList.contains("open")) {
+          if (ev.key !== "Escape") {
+            return;
+          }
+          if (removeOverlay.classList.contains("open")) {
+            closeRemove();
+          } else if (editOverlay.classList.contains("open")) {
             closeEdit();
           }
         });
