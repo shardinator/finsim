@@ -185,6 +185,66 @@ async fn remove_bank(
     }
 }
 
+fn swap_banks_by_index(banks: &mut [Bank], a: usize, b: usize) {
+    banks.swap(a, b);
+}
+
+#[handler]
+async fn move_bank_up(
+    state: Data<&AppState>,
+    Path(BankIdPath { id }): Path<BankIdPath>,
+) -> poem::Result<Redirect> {
+    let mut banks = state.banks.lock().await;
+    let backup = banks.clone();
+
+    let Some(idx) = banks.iter().position(|b| b.id == id) else {
+        return Ok(Redirect::see_other("/settings"));
+    };
+    if idx == 0 {
+        return Ok(Redirect::see_other("/settings"));
+    }
+
+    swap_banks_by_index(&mut banks, idx, idx.saturating_sub(1));
+    match storage::save_banks(&state.storage_path, &banks) {
+        Ok(()) => Ok(Redirect::see_other("/settings")),
+        Err(e) => {
+            *banks = backup;
+            Err(poem::Error::from_string(
+                format!("failed to save banks: {e}"),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            ))
+        }
+    }
+}
+
+#[handler]
+async fn move_bank_down(
+    state: Data<&AppState>,
+    Path(BankIdPath { id }): Path<BankIdPath>,
+) -> poem::Result<Redirect> {
+    let mut banks = state.banks.lock().await;
+    let backup = banks.clone();
+
+    let Some(idx) = banks.iter().position(|b| b.id == id) else {
+        return Ok(Redirect::see_other("/settings"));
+    };
+    if idx.saturating_add(1) >= banks.len() {
+        return Ok(Redirect::see_other("/settings"));
+    }
+
+    swap_banks_by_index(&mut banks, idx, idx + 1);
+    match storage::save_banks(&state.storage_path, &banks) {
+        Ok(()) => Ok(Redirect::see_other("/settings")),
+        Err(e) => {
+            *banks = backup;
+            Err(poem::Error::from_string(
+                format!("failed to save banks: {e}"),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            ))
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let tera = Tera::new("templates/**/*").expect("failed to load templates");
@@ -210,6 +270,8 @@ async fn main() -> std::io::Result<()> {
         .at("/settings", get(settings))
         .at("/banks/:id/remove", post(remove_bank))
         .at("/banks/:id/update", post(update_bank))
+        .at("/banks/:id/move-up", post(move_bank_up))
+        .at("/banks/:id/move-down", post(move_bank_down))
         .at("/banks", post(create_bank))
         .data(state);
 

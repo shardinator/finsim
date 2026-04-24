@@ -192,10 +192,41 @@
         border-radius: 10px;
         background: #fff;
       }
+      .bankItemActions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .btnOrder {
+        appearance: none;
+        border: none;
+        background: #e2e8f0;
+        color: #0b2a6f;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.2;
+        padding: 8px 12px;
+        min-height: 36px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .btnOrder:hover {
+        background: #cbd5e1;
+      }
+      .btnOrder:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+      }
+      .btnOrder[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
       .bankItemName {
         flex: 0 1 auto;
         width: max-content;
-        max-width: calc(100% - 120px);
+        max-width: calc(100% - 220px);
         min-width: 0;
         margin: 0;
         padding: 3px 6px;
@@ -251,10 +282,6 @@
       .btn.btnSecondary:focus-visible {
         outline: 2px solid #3b82f6;
         outline-offset: 2px;
-      }
-      .bankItem .btnRemove {
-        flex-shrink: 0;
-        align-self: center;
       }
       .btnRemove {
         appearance: none;
@@ -570,14 +597,42 @@
             >
               {{ bank.name }}
             </button>
-            <button
-              type="button"
-              class="btnRemove"
-              data-bank-id="{{ bank.id }}"
-              data-bank-name="{{ bank.name }}"
-            >
-              Remove
-            </button>
+            <div class="bankItemActions" aria-label="Bank actions">
+              <form
+                method="post"
+                action="/banks/{{ bank.id }}/move-up"
+                aria-label="Move bank up"
+              >
+                <button
+                  type="submit"
+                  class="btnOrder"
+                  {% if loop.first %}disabled{% endif %}
+                >
+                  Up
+                </button>
+              </form>
+              <form
+                method="post"
+                action="/banks/{{ bank.id }}/move-down"
+                aria-label="Move bank down"
+              >
+                <button
+                  type="submit"
+                  class="btnOrder"
+                  {% if loop.last %}disabled{% endif %}
+                >
+                  Down
+                </button>
+              </form>
+              <button
+                type="button"
+                class="btnRemove"
+                data-bank-id="{{ bank.id }}"
+                data-bank-name="{{ bank.name }}"
+              >
+                Remove
+              </button>
+            </div>
           </div>
           {% endfor %}
         </div>
